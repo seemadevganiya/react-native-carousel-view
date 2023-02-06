@@ -22,6 +22,8 @@ type Props = {
   indicatorOffset: number,
   indicatorText: string,
   inactiveIndicatorText: string,
+  activeIndicatorStyle?:{[attr:String]: any},
+  inActiveIndicatorStyle?:{[attr:String]: any},
   width: ?number,
   height: number,
   initialPage: number,
@@ -184,7 +186,7 @@ export default class Carousel extends Component {
     const {hideIndicators, indicatorOffset,
       indicatorAtBottom, indicatorSpace,
       indicatorColor, inactiveIndicatorColor,
-      indicatorSize, indicatorText, inactiveIndicatorText} = this.props;
+      indicatorSize, indicatorText, inactiveIndicatorText, activeIndicatorStyle, inActiveIndicatorStyle} = this.props;
     const {activePage} = this.state;
     //console.log("activePage =>", activePage);
     if (hideIndicators === true) {
@@ -208,22 +210,8 @@ export default class Carousel extends Component {
       // style = i === activePage ?
       //   {color: indicatorColor} :
       //   {color: inactiveIndicatorColor};
-      style= i === activePage ?{ width: 18,
-        height: 8,
-        borderRadius: 16,
-        backgroundColor: '#16263F',
-        borderColor:  '#16263F',
-        borderWidth: 1,
-        marginHorizontal: 5} : 
-        {
-          width: 8,
-  height: 8,
-  borderRadius: 16,
-  backgroundColor: "transparent",
-  borderColor: '#16263F',
-  borderWidth: 1,
-  marginHorizontal: 5
-        }
+      style= i === activePage ?activeIndicatorStyle : 
+       inActiveIndicatorStyle
       indicators.push(
         // <Text
         //   style={[style, {fontSize: indicatorSize}]}
