@@ -100,7 +100,7 @@ export default class Carousel extends Component {
     this.children = Children.toArray(children).filter((child) => child);
   }
 
-  componentWillReceiveProps(nextProps: Props) {
+  UNSAFE_componentWillReceiveProps(nextProps: Props) {
     this._filterChildren();
 
     // when received props it will update all views, with new props.
@@ -186,6 +186,7 @@ export default class Carousel extends Component {
       indicatorColor, inactiveIndicatorColor,
       indicatorSize, indicatorText, inactiveIndicatorText} = this.props;
     const {activePage} = this.state;
+    //console.log("activePage =>", activePage);
     if (hideIndicators === true) {
       return null;
     }
@@ -204,17 +205,39 @@ export default class Carousel extends Component {
     };
 
     this.children.forEach((child, i) => {
-      style = i === activePage ?
-        {color: indicatorColor} :
-        {color: inactiveIndicatorColor};
+      // style = i === activePage ?
+      //   {color: indicatorColor} :
+      //   {color: inactiveIndicatorColor};
+      style= i === activePage ?{ width: 18,
+        height: 8,
+        borderRadius: 16,
+        backgroundColor: '#16263F',
+        borderColor:  '#16263F',
+        borderWidth: 1,
+        marginHorizontal: 5} : 
+        {
+          width: 8,
+  height: 8,
+  borderRadius: 16,
+  backgroundColor: "transparent",
+  borderColor: '#16263F',
+  borderWidth: 1,
+  marginHorizontal: 5
+        }
       indicators.push(
-        <Text
-          style={[style, {fontSize: indicatorSize}]}
-          key={i}
-          onPress={() => this.indicatorPressed(i)}
-        >
-          {i === activePage ? indicatorText : inactiveIndicatorText}
-        </Text>
+        // <Text
+        //   style={[style, {fontSize: indicatorSize}]}
+        //   key={i}
+        //   onPress={() => this.indicatorPressed(i)}
+        // >
+        //   {i === activePage ? indicatorText : inactiveIndicatorText}
+        // </Text>
+        <View
+        key={i}
+        style={style}
+      />
+
+    
       );
     });
 
@@ -224,7 +247,7 @@ export default class Carousel extends Component {
     }
 
     return (
-      <View style={[styles.pageIndicator, position, positionIndicatorStyle]}>
+      <View style={[position, positionIndicatorStyle, styles.pageIndicator]}>
         {indicators}
       </View>
     );
@@ -235,15 +258,15 @@ export default class Carousel extends Component {
     const width = this.getWidth();
     return (
       <View style={{width}}>
-        <View style={{width, height, overflow: 'hidden'}}>
+        <View style={{width, overflow: 'hidden'}}>
           <CarouselPager
             ref={(pager) => {
               this.pager = pager;
             }}
             width={width}
-            height={height}
+            //height={height}
             contentContainerStyle={[
-              styles.contentContainer,
+              //styles.contentContainer,
               contentContainerStyle,
             ]}
             onScroll={onScroll}
