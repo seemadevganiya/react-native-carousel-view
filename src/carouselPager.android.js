@@ -1,14 +1,14 @@
 /**
  * @flow
  */
-import React, {Component} from 'react';
+import React, {Component, Children} from 'react';
 import {
-  ViewPagerAndroid,
+  ScrollView,
 } from 'react-native';
 
 type Props = {
-  width: number,
   height: number,
+  width: number,
   onEnd: (activePage: number) => void,
   onBegin: () => void,
   onScroll: () => void,
@@ -17,72 +17,72 @@ type Props = {
 }
 
 export default class CarouselPager extends Component {
-  viewPager: ViewPagerAndroid
   props: Props
-
-  state: {
-    pageState: string
-  }
+  scrollView: ScrollView
 
   constructor(props: Props) {
     super(props);
     (this: any).scrollToPage = this.scrollToPage.bind(this);
-    (this: any)._pageStateChange = this._pageStateChange.bind(this);
-    (this: any)._selectedPage = this._selectedPage.bind(this);
-    (this: any)._pageScroll = this._pageScroll.bind(this);
-
-    this.state = {
-      pageState: 'idle',
-    };
+    (this: any)._onMomentumScrollEnd = this._onMomentumScrollEnd.bind(this);
   }
 
   scrollToPage(page: number, animated?: boolean) {
     if (typeof animated === 'undefined') {
       animated = true;
     }
-    if (animated) {
-      this.viewPager.setPage(page);
-    } else {
-      this.viewPager.setPageWithoutAnimation(page);
-    }
+
+    this.scrollView.scrollTo({
+      x: page * this.props.width,
+      y: 0,
+      animated,
+    });
   }
 
-  _pageScroll() {
-    const {onScroll} = this.props;
-    onScroll();
-  }
-
-  _selectedPage(e) {
-    const {onEnd} = this.props;
-    const activePage = e.nativeEvent.position;
-    this.setState({activePage});
-
+  _onMomentumScrollEnd(e) {
+    const {onEnd, width} = this.props;
+    const activePage = Math.round(e.nativeEvent.contentOffset.x / width);
     onEnd(activePage);
   }
-
-  _pageStateChange(pageState) {
-    const {onBegin} = this.props;
-    if (pageState === 'dragging') {
-      // if page state is dragging, call on begin
-      return this.setState({pageState}, onBegin());
-    }
-    return this.setState({pageState});
-  }
+ 
 
   render() {
-    const {children, contentContainerStyle, width, height} = this.props;
+    const {
+      onBegin,
+      onScroll,
+      children,
+      contentContainerStyle,
+      width,
+      height,
+    } = this.props;
+    const newChildren = Children.map(children, (element) => {
+      if (!React.isValidElement(element)) return;
+      const {style, ...restProps} = element.props;
+      return React.cloneElement(element, {
+        ...restProps,
+        // add width and height from contentContainerStyle
+        style: [{width, height}, style],
+      });
+    });
+
     return (
-      <ViewPagerAndroid
-        ref={(viewPager) => {
-          this.viewPager = viewPager;
+      <ScrollView
+        ref={(scrollView) => {
+          this.scrollView = scrollView;
         }}
-        style={[contentContainerStyle, {width, height}]}
-        onPageScroll={this._pageScroll}
-        onPageScrollStateChanged={this._pageStateChange}
-        onPageSelected={this._selectedPage}
+        contentContainerStyle={contentContainerStyle}
+        automaticallyAdjustContentInsets={false}
+        scrollEventThrottle={16}
+        horizontal={true}
+        pagingEnabled={true}
+        showsHorizontalScrollIndicator={false}
+        bounces={false}
+        onScrollBeginDrag={onBegin}
+        onScroll={onScroll}
+        onMomentumScrollEnd={this._onMomentumScrollEnd}
+        scrollsToTop={false}
       >
-        {children}
-      </ViewPagerAndroid>
+        {newChildren}
+      </ScrollView>
     );
   }
 }
