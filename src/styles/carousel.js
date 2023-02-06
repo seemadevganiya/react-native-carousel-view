@@ -9,11 +9,10 @@ export default StyleSheet.create({
     height: 200,
   },
   pageIndicator: {
-    position: 'absolute',
+    position: 'relative',
     flexDirection: 'row',
-    justifyContent: 'space-around',
     alignItems: 'center',
-    alignSelf: 'center',
     backgroundColor: 'transparent',
+    top:12
   },
 });
